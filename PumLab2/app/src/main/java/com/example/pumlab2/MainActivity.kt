@@ -8,7 +8,7 @@ import android.util.Log
 import android.content.Context
 
 class MainActivity : AppCompatActivity() {
-    private val TAG = "MainActivity
+    private val TAG = "MainActivity"
     private val PREFS_NAME = "counterPrefs"  // Nazwa pliku z preferencjami
     private val COUNTER_KEY = "clickCounter" // Klucz, pod którym zapisujemy licznik
 
