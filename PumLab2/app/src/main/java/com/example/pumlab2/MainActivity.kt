@@ -8,10 +8,7 @@ import android.util.Log
 import android.content.Context
 
 class MainActivity : AppCompatActivity() {
-    private val TAG = "MainActivity"
-    private val STATE_HISTORY_KEY = "stateHistory"
-//    private lateinit var textView: TextView
-//    private val stateHistory = StringBuilder()
+    private val TAG = "MainActivity
     private val PREFS_NAME = "counterPrefs"  // Nazwa pliku z preferencjami
     private val COUNTER_KEY = "clickCounter" // Klucz, pod którym zapisujemy licznik
 
@@ -40,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState != null) {
             clickCount = savedInstanceState.getInt(COUNTER_KEY, 0)
         }
-        else{
+        else{ // Przywrócenie licznika z zapisanych preferencji po zamknięciu aplikacji
             val sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             clickCount = sharedPreferences.getInt(COUNTER_KEY, 0) // Domyślnie 0, jeśli brak danych
             logAndAppend("sharedPreferences readed")
@@ -61,11 +58,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-
-//        val sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-//        clickCount = sharedPreferences.getInt(COUNTER_KEY, 0) // Domyślnie 0, jeśli brak danych
-//        logAndAppend("sharedPreferences readed")
-
         logAndAppend("onStart called")
     }
 
@@ -102,7 +94,5 @@ class MainActivity : AppCompatActivity() {
 
     private fun logAndAppend(message: String) {
         Log.d(TAG, message)
-//        stateHistory.append("\n").append(message)
-//        textView.append("\n$message")
     }
 }
