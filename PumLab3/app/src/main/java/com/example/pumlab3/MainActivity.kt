@@ -1,6 +1,7 @@
 package com.example.pumlab3
 
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -15,12 +16,21 @@ class MainActivity : AppCompatActivity() {
     private lateinit var letterInput: EditText
     private lateinit var checkButton: Button
     private lateinit var resetButton: Button
+    private lateinit var hangmanImage: ImageView
 
     private val TAG = "MainActivity"
     private var wordToGuess = ""
     private var guessedWord = charArrayOf()
-    private var triesLeft = 6
+    private var triesLeft = 9
+    private var imageNumber = 1
     private val guessedLetters = mutableSetOf<Char>()
+
+
+    private lateinit var startSound: MediaPlayer
+    private lateinit var correctSound: MediaPlayer
+    private lateinit var wrongSound: MediaPlayer
+    private lateinit var winSound: MediaPlayer
+    private lateinit var loseSound: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,23 +42,36 @@ class MainActivity : AppCompatActivity() {
         letterInput = findViewById(R.id.letterInput)
         checkButton = findViewById(R.id.checkButton)
         resetButton = findViewById(R.id.resetButton)
+        hangmanImage = findViewById(R.id.hangmanImage)
+
+        startSound = MediaPlayer.create(this, R.raw.start)
+        correctSound = MediaPlayer.create(this, R.raw.poprawna)
+        wrongSound = MediaPlayer.create(this, R.raw.niepoprawna)
+        winSound = MediaPlayer.create(this, R.raw.wygrana)
+        loseSound = MediaPlayer.create(this, R.raw.przegrana)
 
         resetGame()
+        //
+        val imageId = resources.getIdentifier("image${0}", "drawable", packageName)
+        hangmanImage.setImageResource(imageId)
 
         checkButton.setOnClickListener { checkLetter() }
         resetButton.setOnClickListener { resetGame() }
     }
 
     private fun resetGame() {
+        startSound.start()
         wordToGuess = WORDS[Random.nextInt(WORDS.size)]
         guessedWord = CharArray(wordToGuess.length) { '_' }
         guessedLetters.clear()
         updateGuessedWord(' ')
-        triesLeft = 6
+        triesLeft = 9
+        imageNumber = 1
         checkButton.isEnabled = true
         statusTextView.text = ""
         Log.d(TAG, wordToGuess)
         updateWordDisplay()
+        updateHangmanImage()
     }
 
     private fun updateWordDisplay() {
@@ -59,19 +82,24 @@ class MainActivity : AppCompatActivity() {
         wordTextView.text = displayedWord
         triesTextView.text = "Pozostałe próby: $triesLeft"
     }
-    private fun updateGuessedWord(letter: Char) {
+    private fun updateGuessedWord(letter: Char): Boolean {
         if (!guessedLetters.contains(letter))
         {
             guessedLetters.add(letter)
         }
         if (wordToGuess.lowercase().contains(letter)) {
+//            correctSound.start()
             for (i in wordToGuess.indices) {
                 if (wordToGuess[i] == letter) {
                     guessedWord[i] = letter
                 }
             }
+            return true
         } else {
+//            wrongSound.start()
             triesLeft--
+            imageNumber++
+            return false
         }
     }
 
@@ -90,19 +118,48 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        updateGuessedWord(letter)
+        val isCorrect = updateGuessedWord(letter)
+        updateHangmanImage()
         updateWordDisplay()
-        checkGameStatus()
+        val gameResult = checkGameStatus()
+        if (gameResult == null) {
+            if (isCorrect){
+                correctSound.start()
+            }
+            else{
+                wrongSound.start()
+            }
+        }
+        else{
+            if (gameResult){
+                winSound.start()
+            }else{
+                loseSound.start()
+            }
+        }
     }
 
-    private fun checkGameStatus() {
+    private fun checkGameStatus(): Boolean? {
         if (String(guessedWord) == wordToGuess.lowercase()) {
             statusTextView.text = "Gratulacje! Odgadłeś słowo!"
             checkButton.isEnabled = false
+            //winSound.start()
+            //
+            val imageId = resources.getIdentifier("image${0}", "drawable", packageName)
+            hangmanImage.setImageResource(imageId)
+            return true
         } else if (triesLeft == 0) {
             statusTextView.text = "Przegrałeś! Słowo to: $wordToGuess"
             checkButton.isEnabled = false
+            //loseSound.start()
+            return false
         }
+        return null
+    }
+
+    private fun updateHangmanImage() {
+        val imageId = resources.getIdentifier("image${imageNumber}", "drawable", packageName)
+        hangmanImage.setImageResource(imageId)
     }
 
     private val WORDS = listOf(
