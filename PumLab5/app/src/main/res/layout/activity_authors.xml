@@ -13,7 +13,7 @@
             android:id="@+id/authorsText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Autorzy:\nOliwia Paliwoda"
+            android:text="Autorzy:\nCezary Tytko"
             android:textSize="18sp"
             android:textAlignment="center"
             android:layout_marginBottom="24dp" />
