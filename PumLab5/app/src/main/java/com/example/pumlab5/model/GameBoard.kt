@@ -16,16 +16,40 @@ class GameBoard(
 
     fun shuffle() {
         tiles.clear()
-        val numbers = (1..15).toMutableList().shuffled()
-        repeat(16) { i ->
-            val number = if (i < 15) numbers[i] else null
+
+        // Utwórz poprawnie ułożoną planszę: 1..15 i jedno puste pole (null)
+        val numbers :MutableList<Int?> = (1..15).map { it }.toMutableList()
+        numbers.add(null)
+
+        numbers.forEach { number ->
             val tile = Tile(context, number)
             tile.setOnClickListener { tryMove(tile) }
             tiles.add(tile)
         }
+
+        // Wykonaj 1000 losowych, poprawnych ruchów
+        repeat(1000) { performRandomMove() }
+
         updateGrid()
         SoundManager.playShuffle(context)
     }
+
+    private fun performRandomMove() {
+        val emptyIndex = tiles.indexOfFirst { it.number == null }
+        val row = emptyIndex / 4
+        val col = emptyIndex % 4
+
+        val possibleMoves = listOfNotNull(
+            if (row > 0) emptyIndex - 4 else null,     // góra
+            if (row < 3) emptyIndex + 4 else null,     // dół
+            if (col > 0) emptyIndex - 1 else null,     // lewo
+            if (col < 3) emptyIndex + 1 else null      // prawo
+        )
+
+        val moveIndex = possibleMoves.random()
+        Collections.swap(tiles, emptyIndex, moveIndex)
+    }
+
 
     private fun tryMove(tile: Tile) {
         val index = tiles.indexOf(tile)
